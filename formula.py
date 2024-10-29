@@ -9,7 +9,7 @@ class Formula:
     Represents a mathematical formula to find a root of a polynomial (i.e the Quadratic Formula)
 
     """
-    OPERATIONS = ['+', '-', '*', '/', '**']
+    OPERATIONS = ['+', '-', '*', '/', '**','root']
     CONSTANTS = [(1),(2),(3),(4)]
     #options for equation coefficients
     FIRST_DEGREE = [('a'), ('b')]
@@ -20,16 +20,18 @@ class Formula:
         self.min_length = min_length
         self.degree_of_polynomial = degree_of_polynomial
         self.formula = []
+        self.length_of_constants = -1
 
         #determine which coefficent set to use for formula
         if self.degree_of_polynomial == 1:
             self.formula.extend(self.FIRST_DEGREE)  # add appropriate coefficients to the formula linked list
             self.formula.extend(self.CONSTANTS)  # add constants to the formula
+            self.length_of_constants = len(self.FIRST_DEGREE) + len(self.CONSTANTS)
 
-            #self.coefficient_options = self.FIRST_DEGREE
         if self.degree_of_polynomial == 2:
             self.formula.extend(self.SECOND_DEGREE) # add appropriate coefficients to the formula linked list
             self.formula.extend(self.CONSTANTS) # add constants to the formula
+            self.length_of_constants = len(self.SECOND_DEGREE) + len(self.CONSTANTS)
 
         #randomly generate a formula in of random length in specified range
         for _ in range(random.choice(range(self.min_length,self.max_length))):
@@ -37,25 +39,61 @@ class Formula:
             first_pointer, second_pointer = random.sample(range(len(self.formula)), 2) #pick two random new elements to point to
             self.formula.append((operator, first_pointer, second_pointer))
 
+    def evaluate_formula(self, expression):
+        a, b, c, root_1, root_2 = expression
+        constants = self.formula[self.length_of_constants:]
 
 
-        def solve_quadratic_equation(self, a, b, c, root_1, root_2):
-            """
-            Calculate the roots of a quadratic polynomial with coefficients a,b,c.
-            Returns the calculated root and the percent error to the actual closest root.
-            """
-        def solve_linear_equation(self, m, b ,y, answer_x):
-            """
-            Calculate the value of x to satisfy a linear equation in standard form with coefficients m, b, y
-            Returns the calculated root and percent error to the actual root.
-            """
+        #replace variables with actual values
+        for j in range(len(constants)):
+            if constants[j] == 'a':
+                self.formula[j] = a
+            if constants[j] == 'b':
+                self.formula[j] = b
+            if constants[j] == 'c':
+                self.formula[j] = c
 
-        def fitness_function(self):
-            """
-            Calculate the fitness of the polynomial by solving the equations in the dataset
-            Returns the average percent error of all the solutions.
-            """
-            pass
+        values = self.formula[:self.length_of_constants]
+        for i in range(self.length_of_constants,len(self.formula)):
+            operator, first_pointer, second_pointer = self.formula[i]
+            first_pointer = int(first_pointer)
+            second_pointer = int(second_pointer)
+
+
+            # check the pointers refer to valid indices
+            if first_pointer < len(values) and second_pointer < len(values):
+                left_value = values[first_pointer]
+                right_value = values[second_pointer]
+
+                result = None
+
+                if operator == '+':
+                    result = left_value + right_value
+                if operator == '-':
+                    result = left_value - right_value
+                if operator == '*':
+                    result = left_value*right_value
+                if operator == '/':
+                    result = left_value / right_value
+                if operator == '**':
+                    result = left_value ** right_value
+                if operator == 'root':
+                    result = left_value ** (1/right_value)
+
+                # check if result is none
+                if result is not None:
+                    values.append(result)
+        return values[-1]
+
+
+if __name__ == '__main__':
+    formula = Formula(5,20,2)
+    print(formula.formula)
+    formula.evaluate_formula((1,1,1,1,1))
+
+
+
+
 
 
 
