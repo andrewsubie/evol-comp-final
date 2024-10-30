@@ -3,6 +3,47 @@ import numpy as np
 import copy
 import unittest
 import random
+
+def pretty_print_formula(formula):
+    """
+    Takes in a list-form formula and makes a slightly more readable form of
+    the actual computed formula. (Work back from final index)
+
+    formula : List
+        List matching Formula's formula field format.
+    """
+    def print_unit(formula_unit):
+        """
+        Helper function, will recursively print the formula element
+        
+        formula_unit : Tuple
+            Either an operation tuple, a constant, or a coefficient.
+            
+        print_string : str
+            The string representing the actual formula  
+        """
+        if type(formula_unit) is tuple:
+            # Split formula unit into operation, atomic1, atomic2
+            op, at1, at2 = formula_unit
+            
+            if op == "root":
+                op = " root "
+            
+            print_string ='('
+            
+            
+            print_string += print_unit(formula[at1])
+            print_string += op
+            print_string += print_unit(formula[at2])
+            
+            print_string += ')'
+            return print_string
+        else:
+            # Its only an atomic, convert to string
+            return str(formula_unit)
+    print("\n",print_unit(formula[-1]),"\n")
+    
+
 class Formula:
     """
     Formula class
@@ -89,7 +130,8 @@ class Formula:
 if __name__ == '__main__':
     formula = Formula(5,20,2)
     print(formula.formula)
-    formula.evaluate_formula((1,1,1,1,1))
+    pretty_print_formula(formula.formula)
+    # formula.evaluate_formula((1,1,1,1,1))
 
 
 
