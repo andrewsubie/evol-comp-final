@@ -45,6 +45,13 @@ class Formula:
             first_pointer, second_pointer = random.sample(range(len(self.formula)), 2)  # pick two random elements to point to
             self.formula.append((operator, first_pointer, second_pointer))
 
+    def mutate_formula(self, elements_to_mutate):
+        """
+        @param elements_to_mutate: specifies number of elements to mutate
+        @return None
+        """
+
+
 
     def pretty_print_formula(formula):
         """
