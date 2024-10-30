@@ -45,6 +45,45 @@ class Formula:
             first_pointer, second_pointer = random.sample(range(len(self.formula)), 2)  # pick two random elements to point to
             self.formula.append((operator, first_pointer, second_pointer))
 
+
+    def pretty_print_formula(formula):
+        """
+        Takes in a list-form formula and makes a slightly more readable form of
+        the actual computed formula. (Work back from final index)
+
+        formula : List
+            List matching Formula's formula field format.
+        """
+
+        def print_unit(formula_unit):
+            """
+            Helper function, will recursively print the formula element
+
+            formula_unit : Tuple
+                Either an operation tuple, a constant, or a coefficient.
+
+            print_string : str
+                The string representing the actual formula
+            """
+            if type(formula_unit) is tuple:
+                # Split formula unit into operation, atomic1, atomic2
+                op, at1, at2 = formula_unit
+                if op == "root":
+                    op = " root "
+                print_string = '('
+
+                print_string += print_unit(formula[at1])
+                print_string += op
+                print_string += print_unit(formula[at2])
+
+                print_string += ')'
+                return print_string
+            else:
+                # Its only an atomic, convert to string
+                return str(formula_unit)
+
+        print("\n", print_unit(formula[-1]), "\n")
+
     def evaluate_formula_quadratic(self, expression):
         """
         Evaluates the formula by iterating through self.formula for a given expression, replacing the
@@ -131,7 +170,6 @@ if __name__ == '__main__':
     for result in results:
         assert(result is not None)
         assert(isinstance(result,int) or isinstance(result,float))
-
 
 
 
