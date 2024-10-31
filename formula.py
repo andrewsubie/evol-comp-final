@@ -1,5 +1,6 @@
 # class to represent a formula for finding the roots of a n-th degree polynomial.
 import random
+import copy
 
 class Formula:
     """
@@ -45,15 +46,24 @@ class Formula:
             first_pointer, second_pointer = random.sample(range(len(self.formula)), 2)  # pick two random elements to point to
             self.formula.append((operator, first_pointer, second_pointer))
 
-    def mutate_formula(self, elements_to_mutate):
+    def mutate_formula(self,num_elements_to_mutate):
         """
+        For the number of elements specified in num_elements_to_mutate, a randomly selected element is selected and changed
+        to a new value.
         @param elements_to_mutate: specifies number of elements to mutate
         @return None
         """
+        # select indices to mutate
+        indices_to_mutate = random.sample(range(self.length_of_constants, len(self.formula)), num_elements_to_mutate)
+        # generate new block in formula
+        for index in indices_to_mutate:
+            operator = random.choice(self.OPERATIONS)
+            first_pointer, second_pointer = random.sample(range(len(self.formula)), 2)
+            self.formula[index] = (operator, first_pointer, second_pointer)
 
 
 
-    def pretty_print_formula(formula):
+    def pretty_print_formula(self):
         """
         Takes in a list-form formula and makes a slightly more readable form of
         the actual computed formula. (Work back from final index)
@@ -79,9 +89,9 @@ class Formula:
                     op = " root "
                 print_string = '('
 
-                print_string += print_unit(formula[at1])
+                print_string += print_unit(self.formula[at1])
                 print_string += op
-                print_string += print_unit(formula[at2])
+                print_string += print_unit(self.formula[at2])
 
                 print_string += ')'
                 return print_string
@@ -89,7 +99,7 @@ class Formula:
                 # Its only an atomic, convert to string
                 return str(formula_unit)
 
-        print("\n", print_unit(formula[-1]), "\n")
+        print("\n", print_unit(self.formula[-1]), "\n")
 
     def evaluate_formula_quadratic(self, expression):
         """
@@ -160,7 +170,14 @@ if __name__ == '__main__':
     TEST_CASES = 50
     MIN_LENGTH = 5
     MAX_LENGTH = 20
-    # quadratic test case
+    """
+    test printing
+    """
+    f_test = Formula(5, 20, 2)
+    f_test.pretty_print_formula()
+    """
+    quadratic test case
+    """
     expression_1 = (1,2,1,-1,-1)
     expression_2 = (1,7,6,-1.0,-6.0)
     expression_3 = (1,-41,288,-9.0,-32.0)
@@ -177,6 +194,19 @@ if __name__ == '__main__':
     for result in results:
         assert(result is not None)
         assert(isinstance(result,int) or isinstance(result,float))
+    """
+    mutation test case
+    """
+    f_test_2 = copy.deepcopy((f_test))
+    #make copy, assert equal
+    assert(f_test_2.pretty_print_formula() == f_test.pretty_print_formula())
+    #mutate, assert not equal
+    f_test_2.mutate_formula(1)
+    f_test.pretty_print_formula()
+    f_test_2.pretty_print_formula()
+    assert(f_test_2.evaluate_formula_quadratic(expression_1) != f_test.evaluate_formula_quadratic(expression_1))
+
+
 
 
 
