@@ -1,6 +1,7 @@
 # class to represent a formula for finding the roots of a n-th degree polynomial.
 import random
 import copy
+import numpy as np
 
 class Formula:
     """
@@ -45,6 +46,18 @@ class Formula:
             operator = random.choice(self.OPERATIONS)  #choose operator
             first_pointer, second_pointer = random.sample(range(len(self.formula)), 2)  # pick two random elements to point to
             self.formula.append((operator, first_pointer, second_pointer))
+
+    def extend_formula(self):
+        """
+        Extend the formula by another operator if it is below the max_length
+        """
+        if len(self.formula) < self.max_length:
+            operator = random.choice(self.OPERATIONS)
+            first_pointer, second_pointer = random.sample(range(len(self.formula)), 2)
+            self.formula.append((operator, first_pointer, second_pointer))
+        else:
+            print(f'Formula is already at max length: {self.max_length}')
+
 
     def mutate_formula(self,num_elements_to_mutate):
         """
@@ -100,6 +113,7 @@ class Formula:
                 return str(formula_unit)
 
         print("\n", print_unit(self.formula[-1]), "\n")
+        print_unit(self.formula[-1]),
 
     def evaluate_formula_quadratic(self, expression):
         """
