@@ -1,0 +1,8 @@
+numpy
+random
+matplotlib.pyplot
+scikits.bootstrap
+warnings
+scipy.stats
+time
+csv
