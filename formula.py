@@ -13,7 +13,7 @@ class Formula:
     # options for constants in formula
     CONSTANTS = [1, 2, 3, 4]
     # options for equation coefficients
-    FIRST_DEGREE = ['a', 'b']
+    FIRST_DEGREE = ['m', 'b', 'y']
     SECOND_DEGREE = ['a', 'b', 'c']
 
     def __init__(self, min_length, max_length, degree_of_polynomial):
@@ -115,7 +115,7 @@ class Formula:
         print("\n", print_unit(self.formula[-1]), "\n")
         print_unit(self.formula[-1]),
 
-    def evaluate_formula_quadratic(self, expression):
+    def evaluate_formula(self, expression):
         """
         Evaluates the formula by iterating through self.formula for a given expression, replacing the
         coefficient variables in self.formula with actual values and returns the calculated root
@@ -123,17 +123,29 @@ class Formula:
         standard form, expected in order (a, b, c, root_1, root_2) for ax2+bx+c with roots root_1, root_2)
         @return: calulcated root (float value)
         """
-        a, b, c, root_1, root_2 = expression
-        constants = self.formula[:self.length_of_constants] #isolate constants
+        if self.degree_of_polynomial == 1:
+            m, root_1, b, y = expression
+            constants = self.formula[:self.length_of_constants]
+            for j in range(len(constants)):
+                if constants[j] == 'm':
+                    constants[j] = m
+                if constants[j] == 'b':
+                    constants[j] = b
+                if constants[j] == 'y':
+                    constants[j] = y
 
-        # replace variables with actual values
-        for j in range(len(constants)):
-            if constants[j] == 'a':
-                constants[j] = a
-            elif constants[j] == 'b':
-                constants[j] = b
-            elif constants[j] == 'c':
-                constants[j] = c
+        if self.degree_of_polynomial == 2:
+            a, b, c, root_1, root_2 = expression
+            constants = self.formula[:self.length_of_constants] #isolate constants
+
+            # replace variables with actual values
+            for j in range(len(constants)):
+                if constants[j] == 'a':
+                    constants[j] = a
+                elif constants[j] == 'b':
+                    constants[j] = b
+                elif constants[j] == 'c':
+                    constants[j] = c
 
         values = list(constants)  # list of actual values
         #perform each operation specified in the length of the formula
@@ -190,6 +202,17 @@ if __name__ == '__main__':
     f_test = Formula(5, 20, 2)
     f_test.pretty_print_formula()
     """
+    linear test case
+    """
+    linear_expression = (-6,-4,-93,-69)
+
+    for _ in range(TEST_CASES):
+        f_linear = Formula(MIN_LENGTH, MAX_LENGTH, 1)
+        f_linear.pretty_print_formula()
+        r1 = f_linear.evaluate_formula(linear_expression)
+        print(r1)
+
+    """
     quadratic test case
     """
     expression_1 = (1,2,1,-1,-1)
@@ -198,9 +221,9 @@ if __name__ == '__main__':
     results = []
     for _ in range(TEST_CASES):
         f = Formula(MIN_LENGTH, MAX_LENGTH, 2)
-        r1 = f.evaluate_formula_quadratic(expression_1)
-        r2 = f.evaluate_formula_quadratic(expression_2)
-        r3 = f.evaluate_formula_quadratic(expression_3)
+        r1 = f.evaluate_formula(expression_1)
+        r2 = f.evaluate_formula(expression_2)
+        r3 = f.evaluate_formula(expression_3)
         print(r1, r2, r3)
         results.append(r1)
         results.append(r2)
@@ -218,7 +241,7 @@ if __name__ == '__main__':
     f_test_2.mutate_formula(1)
     f_test.pretty_print_formula()
     f_test_2.pretty_print_formula()
-    assert(f_test_2.evaluate_formula_quadratic(expression_1) != f_test.evaluate_formula_quadratic(expression_1))
+    assert(f_test_2.evaluate_formula(expression_1) != f_test.evaluate_formula(expression_1))
 
 
 
