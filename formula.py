@@ -4,7 +4,6 @@ import copy
 import csv
 import numpy as np
 
-
 class Formula:
     """
     Formula class
@@ -61,6 +60,13 @@ class Formula:
         for _ in range(random.randint(self.min_length, self.max_length)):
             operator = random.choice(self.OPERATIONS)  #choose operator
             first_pointer, second_pointer = random.sample(range(len(self.formula)), 2)  # pick two random elements to point to
+            
+            # This is a bit of an extreme fix, however it works to
+            # prevent absurdly large numbers
+            # Only allow constants to act as second operator in exponent situations
+            if operator == '**' or operator == 'root':
+                second_pointer = np.random.randint(self.degree_of_polynomial+2, self.length_of_constants)
+            
             self.formula.append((operator, first_pointer, second_pointer))
 
     def extend_formula(self):
@@ -88,6 +94,11 @@ class Formula:
         for index in indices_to_mutate:
             operator = random.choice(self.OPERATIONS)
             first_pointer, second_pointer = random.sample(range(len(self.formula)), 2)
+            
+            # Only allow constants to act as second operator in exponent situations
+            if operator == '**' or operator == 'root':
+                second_pointer = np.random.randint(self.degree_of_polynomial+2, self.length_of_constants)
+            
             self.formula[index] = (operator, first_pointer, second_pointer)
 
     def eval_fitness(self):
