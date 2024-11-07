@@ -1,7 +1,9 @@
 # class to represent a formula for finding the roots of a n-th degree polynomial.
 import random
 import copy
+import csv
 import numpy as np
+
 
 class Formula:
     """
@@ -16,18 +18,32 @@ class Formula:
     FIRST_DEGREE = ['m', 'b', 'y']
     SECOND_DEGREE = ['a', 'b', 'c']
 
-    def __init__(self, min_length, max_length, degree_of_polynomial):
+    def __init__(self, min_length, max_length, degree_of_polynomial, path_to_data):
         """
         Constructor takes arguments to specify length of formula, degree of polynomial that it is intended to solve for the roots of
-        to load the appropriate constants into the formula
-        @param: min_length, max_length, degree_of_polynomial
+        to load the appropriate constants into the formula.
+        Path to data is assuemed to be a CSV full of various equations
+        @param: min_length, max_length, degree_of_polynomial, path to data
         @return: None
         """
+        self.fitness = None
+        # init fitness
+        self.path_to_data = path_to_data
         self.max_length = max_length
         self.min_length = min_length
         self.degree_of_polynomial = degree_of_polynomial
         self.formula = []
         self.length_of_constants = -1
+        self.data = []
+        # data to evaluate formula on
+        with open(path_to_data, newline='', encoding='utf-8') as csvfile:
+            csv_reader = csv.reader(csvfile,delimiter=',')
+            for i, row in enumerate(csv_reader):
+                if i > 1:
+                    self.data.append(row)
+                if i == 10:
+                    break
+
 
         # determine which coefficient set to use for formula based on the degree of polynomial the formula is intended to solve
         # add apppropriate coeff. set and constants to the formula
@@ -73,6 +89,41 @@ class Formula:
             operator = random.choice(self.OPERATIONS)
             first_pointer, second_pointer = random.sample(range(len(self.formula)), 2)
             self.formula[index] = (operator, first_pointer, second_pointer)
+
+    def eval_fitness(self):
+        """
+        Evaluates the formula for each data in the test data set, calculates the error for the closest root
+        and returns the mean error of the test dataset.
+        Updates self.fitness
+        :return: self.fitness
+        """
+        def pct_error(orig, priv):
+            """
+            Inner-wrapper function to calculate percent error
+            """
+            return np.abs(orig - priv) / orig * 100.0
+
+        errors = []
+        if self.degree_of_polynomial == 1:
+            for row in self.data:
+                m, x, b, y = row
+                expression = (m, b, y)
+                calc_result = self.evaluate_formula(expression)
+                errors.append(pct_error(x, calc_result))
+        if self.degree_of_polynomial == 2:
+            for row in self.data:
+                id, path, a, b, c, root_1, root_2, equation = row
+                expression = (float(a), float(b), float(c), float(root_1), float(root_2))
+                print(expression)
+                calc_result = self.evaluate_formula(expression)
+                row_errors = []
+                row_errors.append(pct_error(float(root_1), calc_result))
+                row_errors.append(pct_error(float(root_2), calc_result))
+                errors.append(np.min(row_errors))
+        # calculate mean error and convert to logarithmic scale to accomodate large errors, higher fitness = less error (intuition)
+        mean_error = np.abs(np.mean(errors))
+        self.fitness =  100 / (1 + np.log(mean_error + 1))
+        return self.fitness, mean_error
 
 
 
@@ -196,18 +247,23 @@ if __name__ == '__main__':
     TEST_CASES = 50
     MIN_LENGTH = 5
     MAX_LENGTH = 20
+    #file paths
+    PATH_TO_LINEAR = './data/linear_equations_1_variable.csv'
+    PATH_TO_QUAD = './data/quadratic_equation_full_details.csv'
     """
     test printing
     """
-    f_test = Formula(5, 20, 2)
+    print("PRINTING TEST RESULTS")
+    f_test = Formula(5, 20, 2,PATH_TO_QUAD)
     f_test.pretty_print_formula()
     """
     linear test case
     """
+    print("LINEAR")
     linear_expression = (-6,-4,-93,-69)
 
     for _ in range(TEST_CASES):
-        f_linear = Formula(MIN_LENGTH, MAX_LENGTH, 1)
+        f_linear = Formula(MIN_LENGTH, MAX_LENGTH, 1,PATH_TO_LINEAR)
         f_linear.pretty_print_formula()
         r1 = f_linear.evaluate_formula(linear_expression)
         print(r1)
@@ -215,12 +271,13 @@ if __name__ == '__main__':
     """
     quadratic test case
     """
+    print("QUADRATIC")
     expression_1 = (1,2,1,-1,-1)
     expression_2 = (1,7,6,-1.0,-6.0)
     expression_3 = (1,-41,288,-9.0,-32.0)
     results = []
     for _ in range(TEST_CASES):
-        f = Formula(MIN_LENGTH, MAX_LENGTH, 2)
+        f = Formula(MIN_LENGTH, MAX_LENGTH, 2, PATH_TO_QUAD)
         r1 = f.evaluate_formula(expression_1)
         r2 = f.evaluate_formula(expression_2)
         r3 = f.evaluate_formula(expression_3)
@@ -231,18 +288,10 @@ if __name__ == '__main__':
     for result in results:
         assert(result is not None)
         assert(isinstance(result,int) or isinstance(result,float))
+    print("Fitness" + str(f_test.eval_fitness()))
     """
     mutation test case
     """
-    f_test_2 = copy.deepcopy((f_test))
-    #make copy, assert equal
-    assert(f_test_2.pretty_print_formula() == f_test.pretty_print_formula())
-    #mutate, assert not equal
-    f_test_2.mutate_formula(1)
-    f_test.pretty_print_formula()
-    f_test_2.pretty_print_formula()
-    assert(f_test_2.evaluate_formula(expression_1) != f_test.evaluate_formula(expression_1))
-
 
 
 
