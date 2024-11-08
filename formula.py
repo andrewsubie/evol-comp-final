@@ -92,8 +92,9 @@ class Formula:
         indices_to_mutate = random.sample(range(self.length_of_constants, len(self.formula)), num_elements_to_mutate)
         # generate new block in formula
         for index in indices_to_mutate:
+            # Change here: Must constrict to only pointing backwards!
             operator = random.choice(self.OPERATIONS)
-            first_pointer, second_pointer = random.sample(range(len(self.formula)), 2)
+            first_pointer, second_pointer = random.sample(range(index), 2)
             
             # Only allow constants to act as second operator in exponent situations
             if operator == '**' or operator == 'root':
@@ -303,7 +304,18 @@ if __name__ == '__main__':
     """
     mutation test case
     """
-
+    print("\nTest Mutation")
+    try:
+        f_mut = Formula(MIN_LENGTH, MAX_LENGTH, 2, PATH_TO_QUAD)
+        print('Pre-mutation')
+        print(f_mut.formula)
+        f_mut.pretty_print_formula()
+        print('Post-mutation')
+        f_mut.mutate_formula(3)
+        print(f_mut.formula)
+        f_mut.pretty_print_formula()
+    except RecursionError:
+        print('Mutation caused problem')
 
 
 
