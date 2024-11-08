@@ -259,10 +259,16 @@ def crossover_formulas(parent_a, parent_b, len_consts = 7, crossover_points = 2)
     """
     Combines two formula genotypes (<formula_name>.formula) into X children
 
-    parent_a, formula_b : Lists
+    parent_a, parent_b : Lists
         Lists matching Formula's formula field format.
+    len_consts: int
+        Length of constants, to allow crossover to ignore those entries
+    crossover_points: int
+        The number of points to crossover
+        
+    Returns two formulas, similar to the parent parameters 
     """
-    # For ease of writing, the maximum crossover point MUST be less than the shortest length
+    # The maximum crossover point MUST be less than the shortest length
     # otherwise it would be possible to shift the formula-elements down a few indices,
     # which would introduce the chance for a cyclic reference, which would be bad
     min_length = min(len(parent_a), len(parent_b))
