@@ -255,7 +255,7 @@ class Formula:
         else:
             return None
 
-def crossover_formulas(parent_a, parent_b):
+def crossover_formulas(parent_a, parent_b, len_consts = 7, crossover_points = 2):
     """
     Combines two formula genotypes (<formula_name>.formula) into X children
 
@@ -263,21 +263,46 @@ def crossover_formulas(parent_a, parent_b):
         Lists matching Formula's formula field format.
     """
     # For ease of writing, the maximum crossover point MUST be less than the shortest length
+    # otherwise it would be possible to shift the formula-elements down a few indices,
+    # which would introduce the chance for a cyclic reference, which would be bad
     min_length = min(len(parent_a), len(parent_b))
     
     # Pick two indices to select between
-    crossover_points = np.random.randint(0,min_length+1, 2)
-    min_point = min(crossover_points)
-    max_point = max(crossover_points)
+    # Min should be the length of constants, as those should be the same
+    # for both parents -- it would be wasteful to crossover there
+    # The min_length+1 allows for a pseudo-1-pt crossover, should the max be the biggest value
+    crossover_points = np.sort(np.random.randint(len_consts,
+                                                 min_length+1,
+                                                 crossover_points))
+    
+    point_a = crossover_points[0]
+    
+    child_a = parent_a[0:point_a]
+    child_b = parent_b[0:point_a]
+    
+    primary_parent = parent_b
+    secondary_parent = parent_a
     # If the two points match, then it will be like pure inheritance
-    
-    child_a = parent_a[0:min_point]
-    child_a.extend(parent_b[min_point:max_point])
-    child_a.extend(parent_a[max_point:])
-    
-    child_b = parent_b[0:min_point]
-    child_b.extend(parent_a[min_point:max_point])
-    child_b.extend(parent_b[max_point:])
+    for cross_point in crossover_points[1:]:
+        point_b = cross_point
+        
+        child_a.extend(primary_parent[point_a:point_b])
+        child_b.extend(secondary_parent[point_a:point_b])
+            
+        
+        # Swap primary and secondary parents
+        if primary_parent == parent_a:
+            primary_parent = parent_b
+            secondary_parent = parent_a
+        else:
+            primary_parent = parent_a
+            secondary_parent = parent_b
+            
+        # Set point a to the old cross point
+        point_a = cross_point
+
+    child_a.extend(primary_parent[point_a:])
+    child_b.extend(secondary_parent[point_a:])
     
     return child_a, child_b
 
@@ -333,16 +358,45 @@ if __name__ == '__main__':
     print("\nTest Mutation")
     try:
         f_mut = Formula(MIN_LENGTH, MAX_LENGTH, 2, PATH_TO_QUAD)
-        print('Pre-mutation')
+        print("Pre-mutation")
         print(f_mut.formula)
         f_mut.pretty_print_formula()
-        print('Post-mutation')
+        print("Post-mutation")
         f_mut.mutate_formula(3)
         print(f_mut.formula)
         f_mut.pretty_print_formula()
     except RecursionError:
-        print('Mutation caused problem')
-
+        print("Mutation caused problem")
+    
+    """
+    crossover test case
+    """
+    print("\nTest Crossover")
+    try:
+        pf_a = Formula(MIN_LENGTH, MAX_LENGTH, 2, PATH_TO_QUAD)
+        pf_b = Formula(MIN_LENGTH, MAX_LENGTH, 2, PATH_TO_QUAD)
+        
+        child_a = copy.deepcopy(pf_a)
+        child_a.fitness = None
+        child_b = copy.deepcopy(pf_b)
+        child_b.fitness = None
+        
+        print("Pre-crossover")
+        
+        print(f"Parent A: {pf_a.formula}")
+        pf_a.pretty_print_formula()
+        print(f"Parent B: {pf_b.formula}")
+        pf_b.pretty_print_formula()
+        
+        print('Post-crossover')
+        child_a.formula, child_b.formula = crossover_formulas(pf_a.formula, pf_b.formula, pf_a.length_of_constants)
+        print(f"Child A: {child_a.formula}")
+        child_a.pretty_print_formula()
+        print(f"Child B: {child_b.formula}")
+        child_b.pretty_print_formula()
+        
+    except Exception as e:
+        print(e,'Crossover caused problem')
 
 
 
