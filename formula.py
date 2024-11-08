@@ -280,29 +280,23 @@ def crossover_formulas(parent_a, parent_b, len_consts = 7, crossover_points = 2)
     child_a = parent_a[0:point_a]
     child_b = parent_b[0:point_a]
     
-    primary_parent = parent_b
-    secondary_parent = parent_a
+    parents = (parent_a, parent_b)
+    p_select = 1
     # If the two points match, then it will be like pure inheritance
     for cross_point in crossover_points[1:]:
         point_b = cross_point
         
-        child_a.extend(primary_parent[point_a:point_b])
-        child_b.extend(secondary_parent[point_a:point_b])
+        child_a.extend(parents[p_select][point_a:point_b])
+        child_b.extend(parents[1 - p_select][point_a:point_b])
             
-        
         # Swap primary and secondary parents
-        if primary_parent == parent_a:
-            primary_parent = parent_b
-            secondary_parent = parent_a
-        else:
-            primary_parent = parent_a
-            secondary_parent = parent_b
+        p_select = 1 - p_select
             
         # Set point a to the old cross point
         point_a = cross_point
 
-    child_a.extend(primary_parent[point_a:])
-    child_b.extend(secondary_parent[point_a:])
+    child_a.extend(parents[p_select][point_a:])
+    child_b.extend(parents[1 - p_select][point_a:])
     
     return child_a, child_b
 
