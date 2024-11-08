@@ -255,6 +255,32 @@ class Formula:
         else:
             return None
 
+def crossover_formulas(parent_a, parent_b):
+    """
+    Combines two formula genotypes (<formula_name>.formula) into X children
+
+    parent_a, formula_b : Lists
+        Lists matching Formula's formula field format.
+    """
+    # For ease of writing, the maximum crossover point MUST be less than the shortest length
+    min_length = min(len(parent_a), len(parent_b))
+    
+    # Pick two indices to select between
+    crossover_points = np.random.randint(0,min_length+1, 2)
+    min_point = min(crossover_points)
+    max_point = max(crossover_points)
+    # If the two points match, then it will be like pure inheritance
+    
+    child_a = parent_a[0:min_point]
+    child_a.extend(parent_b[min_point:max_point])
+    child_a.extend(parent_a[max_point:])
+    
+    child_b = parent_b[0:min_point]
+    child_b.extend(parent_a[min_point:max_point])
+    child_b.extend(parent_b[max_point:])
+    
+    return child_a, child_b
+
 if __name__ == '__main__':
     TEST_CASES = 50
     MIN_LENGTH = 5
