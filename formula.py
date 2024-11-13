@@ -255,19 +255,20 @@ class Formula:
         else:
             return None
 
-def crossover_formulas(parent_a, parent_b, len_consts = 7, crossover_points = 2):
+def crossover_formulas(F_a, F_b, crossover_points = 2):
     """
     Combines two formula genotypes (<formula_name>.formula) into X children
 
     parent_a, parent_b : Lists
         Lists matching Formula's formula field format.
-    len_consts: int
-        Length of constants, to allow crossover to ignore those entries
     crossover_points: int
         The number of points to crossover
         
     Returns two formulas, similar to the parent parameters 
     """
+    parent_a = F_a.formula
+    parent_b = F_b.formula
+    len_consts = F_a.length_of_constants
     # The maximum crossover point MUST be less than the shortest length
     # otherwise it would be possible to shift the formula-elements down a few indices,
     # which would introduce the chance for a cyclic reference, which would be bad
@@ -389,7 +390,7 @@ if __name__ == '__main__':
         pf_b.pretty_print_formula()
         
         print('Post-crossover')
-        child_a.formula, child_b.formula = crossover_formulas(pf_a.formula, pf_b.formula, pf_a.length_of_constants)
+        child_a.formula, child_b.formula = crossover_formulas(pf_a, pf_b)
         print(f"Child A: {child_a.formula}")
         child_a.pretty_print_formula()
         print(f"Child B: {child_b.formula}")
