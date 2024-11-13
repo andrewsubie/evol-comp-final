@@ -134,7 +134,9 @@ class Formula:
                 errors.append(np.min(row_errors))
         # calculate mean error and convert to logarithmic scale to accomodate large errors, higher fitness = less error (intuition)
         mean_error = np.abs(np.mean(errors))
+        
         self.fitness =  100 / (1 + np.log(mean_error + 1))
+        
         return self.fitness, mean_error
 
 
