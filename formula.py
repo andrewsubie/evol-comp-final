@@ -126,7 +126,7 @@ class Formula:
             for row in self.data:
                 id, path, a, b, c, root_1, root_2, equation = row
                 expression = (float(a), float(b), float(c), float(root_1), float(root_2))
-                print(expression)
+                # print(expression)
                 calc_result = self.evaluate_formula(expression)
                 row_errors = []
                 row_errors.append(pct_error(float(root_1), calc_result))
