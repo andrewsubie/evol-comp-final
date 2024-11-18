@@ -109,11 +109,11 @@ class Formula:
         Updates self.fitness
         :return: self.fitness
         """
-        def pct_error(orig, priv):
+        def pct_error(actual, calculated):
             """
             Inner-wrapper function to calculate percent error
             """
-            return np.abs(orig - priv) / orig * 100.0
+            return np.abs(actual - calculated) / np.abs(actual) * 100.0
 
         errors = []
         if self.degree_of_polynomial == 1:
@@ -132,6 +132,7 @@ class Formula:
                 row_errors.append(pct_error(float(root_1), calc_result))
                 row_errors.append(pct_error(float(root_2), calc_result))
                 errors.append(np.min(row_errors))
+                
         # calculate mean error and convert to logarithmic scale to accomodate large errors, higher fitness = less error (intuition)
         mean_error = np.abs(np.mean(errors))
         
