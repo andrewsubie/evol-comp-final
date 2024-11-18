@@ -11,13 +11,13 @@ class Formula:
     """
     # string representation of mathematical operators
     OPERATIONS = ['+', '-', '*', '/', '**', 'root']
-    # options for constants in formula
-    CONSTANTS = [1, 2, 3, 4]
+    # options for constants in formula (no 1 because it makes *,/, ^ effectivelly null operations
+    CONSTANTS = [2, 3, 4, 5]
     # options for equation coefficients
     FIRST_DEGREE = ['m', 'b', 'y']
     SECOND_DEGREE = ['a', 'b', 'c']
 
-    def __init__(self, min_length, max_length, degree_of_polynomial, path_to_data):
+    def __init__(self, min_length, max_length, degree_of_polynomial, path_to_data, test_data_size=250):
         """
         Constructor takes arguments to specify length of formula, degree of polynomial that it is intended to solve for the roots of
         to load the appropriate constants into the formula.
@@ -25,7 +25,11 @@ class Formula:
         @param: min_length, max_length, degree_of_polynomial, path to data
         @return: None
         """
+        #age of formula
+        self.age = 1
         self.fitness = None
+        #how many equations to use for testing
+        self.test_data_size = test_data_size
         # init fitness
         self.path_to_data = path_to_data
         self.max_length = max_length
@@ -40,7 +44,7 @@ class Formula:
             for i, row in enumerate(csv_reader):
                 if i > 1:
                     self.data.append(row)
-                if i == 10:
+                if i == test_data_size:
                     break
 
 
@@ -68,6 +72,18 @@ class Formula:
                 second_pointer = np.random.randint(self.degree_of_polynomial+2, self.length_of_constants)
             
             self.formula.append((operator, first_pointer, second_pointer))
+
+    def increment_age(self):
+        """
+        Increment the age by 1 generation
+        :return:
+        """
+        self.age += 1
+    def get_age(self):
+        """
+        :return: age (int) in generational time
+        """
+        return self.age
 
     def extend_formula(self):
         """
