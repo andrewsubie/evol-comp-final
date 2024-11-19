@@ -37,15 +37,16 @@ class Formula:
         self.degree_of_polynomial = degree_of_polynomial
         self.formula = []
         self.length_of_constants = -1
+        # data holds data to be evaluated with, full data holds full CSV from which new test datasets are generated
         self.data = []
-        # data to evaluate formula on
+        self.full_data = []
+        # data to evaluate formula. Randomly select data from the full dataset
         with open(path_to_data, newline='', encoding='utf-8') as csvfile:
             csv_reader = csv.reader(csvfile,delimiter=',')
             for i, row in enumerate(csv_reader):
-                if i > 1:
-                    self.data.append(row)
-                if i == test_data_size:
-                    break
+                self.full_data.append(row)
+        data_start = random.randint(0, len(self.data) - (test_data_size+1))
+        self.data = self.full_data[data_start:data_start+test_data_size]
 
 
         # determine which coefficient set to use for formula based on the degree of polynomial the formula is intended to solve
@@ -72,6 +73,11 @@ class Formula:
                 second_pointer = np.random.randint(self.degree_of_polynomial+2, self.length_of_constants)
             
             self.formula.append((operator, first_pointer, second_pointer))
+
+    def randomize_test_data(self):
+        data_start = random.randint(0, len(self.data) - (self.test_data_size + 1))
+        self.data = self.full_data[data_start:data_start + self.test_data_size]
+
 
     def increment_age(self):
         """
@@ -132,6 +138,8 @@ class Formula:
             return np.abs(actual - calculated) / np.abs(actual) * 100.0
 
         errors = []
+        #generate new dataset for each evaluation to prevent overfitting
+        self.randomize_test_data()
         if self.degree_of_polynomial == 1:
             for row in self.data:
                 m, x, b, y = row
