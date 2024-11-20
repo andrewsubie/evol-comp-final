@@ -136,8 +136,8 @@ class Formula:
             """
             Inner-wrapper function to calculate percent error
             """
-            if actual == 0:
-                actual = 1e-10
+            if actual == 0: # Avoids div by 0
+                return np.abs(calculated)
             
             return np.abs(actual - calculated) / np.abs(actual) * 100.0
 
@@ -153,9 +153,8 @@ class Formula:
                 errors.append(pct_error(x, calc_result))
         if self.degree_of_polynomial == 2:
             count = 0 # TODO: Remove this
-            for row in self.full_data[1:]:#self.data:
-                count += 1 #TODO: Remove this
-                print(row)
+            for row in self.full_data:#self.data:
+                
                 id, path, a, b, c, root_1, root_2, equation = row
                 expression = (float(a), float(b), float(c), float(root_1), float(root_2))
                 
@@ -166,7 +165,8 @@ class Formula:
                 row_errors.append(pct_error(float(root_2), calc_result))
                 errors.append(np.min(row_errors))
                 if np.min(row_errors) > 1:
-                    print(id, expression)
+                    count += 1 #TODO: Remove this
+                    print(calc_result,root_1, root_2, id, np.min(row_errors))
         # calculate mean error and convert to logarithmic scale to accomodate large errors, higher fitness = less error (intuition)
         mean_error = np.abs(np.mean(errors))
         print(count)
@@ -270,12 +270,12 @@ class Formula:
                         else:
                             pass
                     elif operator == '**':
-                        if right_value >= 0 and left_value != 0: #handle negative exponentiation
+                        if right_value >= 0: #handle negative exponentiation
                             result = left_value ** right_value
                         else:
                             pass
                     elif operator == 'root':
-                        if right_value != 0 and left_value > 0: #handle 0 root
+                        if right_value != 0 and left_value >= 0: #handle 0 root
                             result = left_value ** (1 / right_value)
                         else:
                             pass
@@ -361,6 +361,7 @@ if __name__ == '__main__':
     quad.formula = q_form
     quad.length_of_constants = 6
     quad.pretty_print_formula()
+    
     print(quad.eval_fitness())
     
     #%%
