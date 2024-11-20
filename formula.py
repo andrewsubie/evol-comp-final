@@ -152,8 +152,7 @@ class Formula:
                 calc_result = self.evaluate_formula(expression)
                 errors.append(pct_error(x, calc_result))
         if self.degree_of_polynomial == 2:
-            count = 0 # TODO: Remove this
-            for row in self.full_data:#self.data:
+            for row in self.data:
                 
                 id, path, a, b, c, root_1, root_2, equation = row
                 expression = (float(a), float(b), float(c), float(root_1), float(root_2))
@@ -164,12 +163,8 @@ class Formula:
                 row_errors.append(pct_error(float(root_1), calc_result))
                 row_errors.append(pct_error(float(root_2), calc_result))
                 errors.append(np.min(row_errors))
-                if np.min(row_errors) > 1:
-                    count += 1 #TODO: Remove this
-                    print(calc_result,root_1, root_2, id, np.min(row_errors))
         # calculate mean error and convert to logarithmic scale to accomodate large errors, higher fitness = less error (intuition)
         mean_error = np.abs(np.mean(errors))
-        print(count)
         self.fitness =  100 / (1 + np.log(mean_error + 1))
         
         return self.fitness, mean_error
