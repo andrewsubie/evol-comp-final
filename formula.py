@@ -45,7 +45,8 @@ class Formula:
             csv_reader = csv.reader(csvfile,delimiter=',')
             for i, row in enumerate(csv_reader):
                 self.full_data.append(row)
-        data_start = random.randint(0, len(self.data) - (test_data_size+1))
+            self.full_data = self.full_data[1:] # Eliminate the label row
+        data_start = random.randint(0, len(self.full_data) - (test_data_size+1))
         self.data = self.full_data[data_start:data_start+test_data_size]
 
 
@@ -135,11 +136,15 @@ class Formula:
             """
             Inner-wrapper function to calculate percent error
             """
+            if actual == 0:
+                actual = 1e-10
+            
             return np.abs(actual - calculated) / np.abs(actual) * 100.0
 
         errors = []
         #generate new dataset for each evaluation to prevent overfitting
-        self.randomize_test_data()
+        #self.randomize_test_data()
+        
         if self.degree_of_polynomial == 1:
             for row in self.data:
                 m, x, b, y = row
@@ -147,19 +152,24 @@ class Formula:
                 calc_result = self.evaluate_formula(expression)
                 errors.append(pct_error(x, calc_result))
         if self.degree_of_polynomial == 2:
-            for row in self.data:
+            count = 0 # TODO: Remove this
+            for row in self.full_data[1:]:#self.data:
+                count += 1 #TODO: Remove this
+                print(row)
                 id, path, a, b, c, root_1, root_2, equation = row
                 expression = (float(a), float(b), float(c), float(root_1), float(root_2))
+                
                 # print(expression)
                 calc_result = self.evaluate_formula(expression)
                 row_errors = []
                 row_errors.append(pct_error(float(root_1), calc_result))
                 row_errors.append(pct_error(float(root_2), calc_result))
                 errors.append(np.min(row_errors))
-                
+                if np.min(row_errors) > 1:
+                    print(id, expression)
         # calculate mean error and convert to logarithmic scale to accomodate large errors, higher fitness = less error (intuition)
         mean_error = np.abs(np.mean(errors))
-        
+        print(count)
         self.fitness =  100 / (1 + np.log(mean_error + 1))
         
         return self.fitness, mean_error
@@ -341,6 +351,20 @@ if __name__ == '__main__':
     #file paths
     PATH_TO_LINEAR = './data/linear_equations_1_variable.csv'
     PATH_TO_QUAD = './data/quadratic_equation_full_details.csv'
+    
+    
+    
+    # actual quadratic formula:
+    # (-b (+|-) root((pow(b,2) - 4 * (a * c)),2)) / (2 * a)\n
+    q_form = ['a', 'b', 'c', 2, 3, 4, ('*',0,2), ('*',5,6), ('**',1,3), ('-',8,7), ('root',9,3), ('-', 10, 1), ('*',3,0),('/',11,12)]
+    quad = Formula(MIN_LENGTH, MAX_LENGTH, 2, PATH_TO_QUAD)
+    quad.formula = q_form
+    quad.length_of_constants = 6
+    quad.pretty_print_formula()
+    print(quad.eval_fitness())
+    
+    #%%
+    
     """
     test printing
     """
@@ -427,9 +451,7 @@ if __name__ == '__main__':
         print(e,'Crossover caused problem')
 
 
-
-
-
+    
 
 
 
