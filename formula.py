@@ -21,7 +21,7 @@ class Formula:
         """
         Constructor takes arguments to specify length of formula, degree of polynomial that it is intended to solve for the roots of
         to load the appropriate constants into the formula.
-        Path to data is assuemed to be a CSV full of various equations
+        Path to data is assumed to be a CSV full of various equations
         @param: min_length, max_length, degree_of_polynomial, path to data
         @return: None
         """
@@ -148,9 +148,9 @@ class Formula:
         if self.degree_of_polynomial == 1:
             for row in self.data:
                 m, x, b, y = row
-                expression = (m, x, b, y)
+                expression = (float(m), float(x), float(b), float(y))
                 calc_result = self.evaluate_formula(expression)
-                errors.append(pct_error(x, calc_result))
+                errors.append(pct_error(float(x), calc_result))
         if self.degree_of_polynomial == 2:
             for row in self.data:
                 
