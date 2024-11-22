@@ -148,7 +148,7 @@ class Formula:
         if self.degree_of_polynomial == 1:
             for row in self.data:
                 m, x, b, y = row
-                expression = (m, b, y)
+                expression = (m, x, b, y)
                 calc_result = self.evaluate_formula(expression)
                 errors.append(pct_error(x, calc_result))
         if self.degree_of_polynomial == 2:
