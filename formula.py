@@ -72,7 +72,13 @@ class Formula:
             # prevent absurdly large numbers
             # Only allow constants to act as second operator in exponent situations
             if operator == '**' or operator == 'root':
-                second_pointer = np.random.randint(self.degree_of_polynomial+2, self.length_of_constants)
+                # 3 is the number of coeffs for both 1st/2nd degree
+                second_pointer = np.random.randint(3, self.length_of_constants)
+                
+                if operator == '**':
+                    # Only select from coefficients - a cheap fix
+                    # that *should* prevent the 'too large' error
+                    first_pointer = np.random.randint(0,3)
             
             self.formula.append((operator, first_pointer, second_pointer))
 
@@ -122,8 +128,14 @@ class Formula:
             
             # Only allow constants to act as second operator in exponent situations
             if operator == '**' or operator == 'root':
-                second_pointer = np.random.randint(self.degree_of_polynomial+2, self.length_of_constants)
-            
+                # 3 is the number of coeffs
+                second_pointer = np.random.randint(3, self.length_of_constants)
+                
+                if operator == '**':
+                    # Only select from coefficients - a cheap fix
+                    # that *should* prevent the 'too large' error
+                    first_pointer = np.random.randint(0,3)
+                    
             self.formula[index] = (operator, first_pointer, second_pointer)
 
     def eval_fitness(self):
@@ -142,7 +154,7 @@ class Formula:
             Inner-wrapper function to calculate percent error
             """
             if actual == 0: # Avoids div by 0
-                return np.abs(calculated)
+                return np.abs(calculated) * 100
             
             return np.abs(actual - calculated) / np.abs(actual) * 100.0
 
