@@ -17,7 +17,7 @@ class Formula:
     FIRST_DEGREE = ['m', 'b', 'y']
     SECOND_DEGREE = ['a', 'b', 'c']
 
-    def __init__(self, min_length, max_length, degree_of_polynomial, path_to_data, test_data_size=250):
+    def __init__(self, min_length, max_length, degree_of_polynomial, path_to_data, test_data_size=250, data=[]):
         """
         Constructor takes arguments to specify length of formula, degree of polynomial that it is intended to solve for the roots of
         to load the appropriate constants into the formula.
@@ -38,16 +38,17 @@ class Formula:
         self.formula = []
         self.length_of_constants = -1
         # data holds data to be evaluated with, full data holds full CSV from which new test datasets are generated
-        self.data = []
+        self.data = data
         self.full_data = []
         # data to evaluate formula. Randomly select data from the full dataset
-        with open(path_to_data, newline='', encoding='utf-8') as csvfile:
-            csv_reader = csv.reader(csvfile,delimiter=',')
-            for i, row in enumerate(csv_reader):
-                self.full_data.append(row)
-            self.full_data = self.full_data[1:] # Eliminate the label row
-        data_start = random.randint(0, len(self.full_data) - (test_data_size+1))
-        self.data = self.full_data[data_start:data_start+test_data_size]
+        if self.data == []:
+            with open(path_to_data, newline='', encoding='utf-8') as csvfile:
+                csv_reader = csv.reader(csvfile,delimiter=',')
+                for i, row in enumerate(csv_reader):
+                    self.full_data.append(row)
+                self.full_data = self.full_data[1:] # Eliminate the label row
+            data_start = random.randint(0, len(self.full_data) - (test_data_size+1))
+            self.data = self.full_data[data_start:data_start+test_data_size]
 
 
         # determine which coefficient set to use for formula based on the degree of polynomial the formula is intended to solve
@@ -132,6 +133,10 @@ class Formula:
         Updates self.fitness
         :return: self.fitness
         """
+        # Ease the computational weight somewhat
+        if self.fitness is not None:
+            return self.fitness
+        
         def pct_error(actual, calculated):
             """
             Inner-wrapper function to calculate percent error
@@ -167,7 +172,7 @@ class Formula:
         mean_error = np.abs(np.mean(errors))
         self.fitness =  100 / (1 + np.log(mean_error + 1))
         
-        return self.fitness, mean_error
+        return self.fitness#, mean_error
 
 
 
@@ -276,6 +281,7 @@ class Formula:
                             pass
                 except Exception as e:
                     print(e)
+                    # print(self.formula, self.formula[i])
                     values.append(values[-1])
 
                 # append result of ea. operation to values
