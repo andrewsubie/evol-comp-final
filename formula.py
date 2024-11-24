@@ -11,6 +11,7 @@ class Formula:
     """
     # string representation of mathematical operators
     OPERATIONS = ['+', '-', '*', '/', '**', 'root']
+    OPERATION_WEIGHTS = [0.2, 0.2, 0.2, 0.2, 0.1, 0.1]
     # options for constants in formula (no 1 because it makes *,/, ^ effectivelly null operations
     CONSTANTS = [2, 3, 4, 5]
     # options for equation coefficients
@@ -65,7 +66,8 @@ class Formula:
 
         # randomly generate a formula of length within allowed range
         for _ in range(random.randint(self.min_length, self.max_length)):
-            operator = random.choice(self.OPERATIONS)  #choose operator
+            # choose operator, weighted choice to make root/** half as likely to be chosen
+            operator = np.random.choice(self.OPERATIONS, 1, p=self.OPERATION_WEIGHTS)
             first_pointer, second_pointer = random.sample(range(len(self.formula)), 2)  # pick two random elements to point to
             
             # This is a bit of an extreme fix, however it works to
