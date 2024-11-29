@@ -212,12 +212,20 @@ class Formula:
             if type(formula_unit) is tuple:
                 # Split formula unit into operation, atomic1, atomic2
                 op, at1, at2 = formula_unit
-                if op == "root":
-                    op = " root "
+                # Op selection process makes it an array!                
+                # Adds spaces to the root op, others look fine without spaces
+                
+                print_op = copy.deepcopy(op) # VERY odd behavior leads to this being necessary
+                if print_op == "root":
+                    print_op = " root "
+                elif print_op == "**": # Handles odd behavior of 2 char op
+                    print_op = "**"
+                else:
+                    print_op = str(print_op[0])
+                    
                 print_string = '('
-
                 print_string += print_unit(self.formula[at1])
-                print_string += op
+                print_string += print_op
                 print_string += print_unit(self.formula[at2])
 
                 print_string += ')'
@@ -227,7 +235,7 @@ class Formula:
                 return str(formula_unit)
 
         print("\n", print_unit(self.formula[-1]), "\n")
-        print_unit(self.formula[-1]),
+        print_unit(self.formula[-1])
 
     def evaluate_formula(self, expression):
         """
@@ -379,7 +387,6 @@ if __name__ == '__main__':
     
     print(quad.eval_fitness())
     
-    #%%
     
     """
     test printing
