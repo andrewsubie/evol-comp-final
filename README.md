@@ -1,6 +1,3 @@
-## Evolutionary Computation: Final
+## Evolutionary Computation
 
-* Link to Quadratic Dataset: 
-https://www.kaggle.com/datasets/archanghosh/images-of-randomly-generated-quadratic-equations/data?select=Quadratic+Equation+Full+Details.csv
-* Link to Linear Dataset: 
-https://www.kaggle.com/datasets/rohitagrawal2610/linear-equations-in-1-variable?select=linear_equations_1_variable.csv
+Writeup: [CS6520A_ Final Writeup_1.pdf](https://github.com/user-attachments/files/18065414/CS6520A_.Final.Writeup_1.pdf)
